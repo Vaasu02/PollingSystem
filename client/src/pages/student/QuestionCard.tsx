@@ -12,11 +12,10 @@ const QuestionCard = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isValidSession, setIsValidSession] = useState(true);
   const isKickedRef = useRef(false);
   const navigate = useNavigate();
   const { sessionId, userName, clearSession } = useSessionContext();
-  const { activePoll, setActivePoll, setPollResults } = usePollContext();
+  const { activePoll, setPollResults } = usePollContext();
   const { socket } = useSocket(sessionId);
 
   useEffect(() => {
@@ -30,10 +29,8 @@ const QuestionCard = () => {
       
       try {
         await api.sessions.getState(sessionId);
-        setIsValidSession(true);
       } catch (error: any) {
         console.log('Session validation error:', error.message);
-        setIsValidSession(false);
         if (error.message?.includes('kicked')) {
           isKickedRef.current = true;
           clearSession();
