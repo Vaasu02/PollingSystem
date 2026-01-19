@@ -6,10 +6,16 @@ import voteRoutes from './routes/voteRoutes';
 import historyRoutes from './routes/historyRoutes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { logger } from './utils/logger';
+import { env } from './config/env';
 
 const app: Application = express();
 
-app.use(cors());
+app.use(cors({
+  origin: env.socketCorsOrigin || 'https://polling-system-five.vercel.app',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
