@@ -39,7 +39,8 @@ const NameInput = () => {
       <div className="w-full max-w-2xl">
         <div className="flex justify-center mb-8">
           <div className="bg-gradient-to-r from-[#7765DA] to-[#4F0DCE] px-4 py-2 rounded-full flex items-center gap-2">
-            <span className="text-white font-semibold">+ Intervue Poll</span>
+            <img src="/Vector.svg" alt="" className="w-4 h-4" />
+            <span className="text-white font-semibold">Intervue Poll</span>
           </div>
         </div>
 
@@ -61,7 +62,7 @@ const NameInput = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-3 bg-[#F2F2F2] rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-[#7765DA] text-[#373737]"
-              placeholder="Rahul Bajaj"
+              placeholder="Vasu K"
               disabled={isLoading}
             />
             {error && (

@@ -177,30 +177,33 @@ const ResultsView = () => {
   const options = localResults.options || [];
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-[#373737] text-white p-6 rounded-lg mb-6">
-          <p className="text-lg">{activePoll.question}</p>
-        </div>
+    <div className="min-h-screen bg-white px-4 flex items-center justify-center">
+      <div className="max-w-2xl w-full">
+        <div className="border border-[#6E6E6E] rounded-[10px] overflow-hidden mb-6 bg-white">
+          <div className="text-white px-4 py-4" style={{ background: 'linear-gradient(90deg, #343434 0%, #6E6E6E 100%)' }}>
+            <p className="text-[17px] font-semibold">{activePoll.question}</p>
+          </div>
 
-        <div className="space-y-4 mb-6">
-          {options.map((option: any, index: number) => (
-            <div key={option.id || index} className="bg-white border border-[#F2F2F2] rounded-lg p-4">
-              <div className="flex items-center gap-4 mb-2">
-                <div className="w-8 h-8 rounded-full bg-[#7765DA] text-white flex items-center justify-center font-semibold">
-                  {index + 1}
+          <div className="p-4 space-y-3">
+            {options.map((option: any, index: number) => {
+              const hasFill = (option.percentage || 0) > 0;
+              return (
+                <div key={option.id || index} className="relative h-[50px] rounded-[8px] overflow-hidden border border-[#E0E0E0]">
+                  <div 
+                    className="absolute inset-y-0 left-0 bg-[#7765DA] transition-all duration-300"
+                    style={{ width: `${option.percentage || 0}%` }}
+                  ></div>
+                  <div className="absolute inset-0 flex items-center px-4">
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0 z-10 ${hasFill ? 'bg-white text-[#7765DA]' : 'bg-[#7765DA] text-white'}`}>
+                      {index + 1}
+                    </div>
+                    <span className={`ml-3 font-medium flex-1 z-10 ${hasFill ? 'text-white' : 'text-[#373737]'}`}>{option.text}</span>
+                    <span className="text-[#373737] font-semibold z-10">{option.percentage || 0}%</span>
+                  </div>
                 </div>
-                <span className="text-[#373737] font-medium flex-1">{option.text}</span>
-                <span className="text-[#373737] font-semibold">{option.percentage || 0}%</span>
-              </div>
-              <div className="w-full bg-[#F2F2F2] rounded-full h-3 mt-2">
-                <div
-                  className="bg-[#7765DA] h-3 rounded-full transition-all duration-300"
-                  style={{ width: `${option.percentage || 0}%` }}
-                ></div>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
 
         <p className="text-center text-[#373737] text-lg">

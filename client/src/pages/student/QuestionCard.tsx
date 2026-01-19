@@ -6,6 +6,7 @@ import { useSocket } from '../../hooks/useSocket';
 import { usePollTimer } from '../../hooks/usePollTimer';
 import { api } from '../../services/api';
 import { socketService } from '../../services/socketService';
+import { LuAlarmClock } from 'react-icons/lu';
 
 const QuestionCard = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -134,50 +135,52 @@ const QuestionCard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-white px-4 flex items-center justify-center">
+      <div className="max-w-2xl w-full">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-[#373737]">Question 1</h2>
-          <div className="flex items-center gap-2">
-            <span className="text-xl">⏰</span>
-            <span className={`text-lg font-semibold ${parseInt(formattedTime.split(':')[1]) < 10 ? 'text-[#F44336]' : 'text-[#373737]'}`}>
+          <div className="flex items-center gap-2 text-[#F44336]">
+            <LuAlarmClock className="text-xl" />
+            <span className="text-lg font-semibold">
               {formattedTime}
             </span>
           </div>
         </div>
 
-        <div className="bg-[#373737] text-white p-6 rounded-lg mb-6">
-          <p className="text-lg">{activePoll.question}</p>
-        </div>
+        <div className="border border-[#6E6E6E] rounded-[10px] overflow-hidden mb-6 bg-white">
+          <div className="text-white px-4 py-4" style={{ background: 'linear-gradient(90deg, #343434 0%, #6E6E6E 100%)' }}>
+            <p className="text-[17px] font-semibold">{activePoll.question}</p>
+          </div>
 
-        <div className="space-y-4 mb-6">
-          {activePoll.options.map((option, index) => (
-            <div
-              key={option._id || index}
-              onClick={() => !hasVoted && !isExpired && setSelectedOption(option._id || '')}
-              className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                selectedOption === option._id
-                  ? 'border-[#7765DA] bg-[#F2F2F2]'
-                  : 'border-[#F2F2F2] bg-white hover:border-[#6E6E6E]'
-              } ${hasVoted || isExpired ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  selectedOption === option._id ? 'bg-[#7765DA] text-white' : 'bg-[#F2F2F2] text-[#373737]'
-                } font-semibold`}>
-                  {index + 1}
+          <div className="p-4 space-y-3">
+            {activePoll.options.map((option, index) => (
+              <div
+                key={option._id || index}
+                onClick={() => !hasVoted && !isExpired && setSelectedOption(option._id || '')}
+                className={`relative h-[50px] rounded-[8px] overflow-hidden border cursor-pointer transition-all ${
+                  selectedOption === option._id
+                    ? 'border-[#7765DA] border-2 bg-[#7765DA]'
+                    : 'border-[#E0E0E0] hover:border-[#7765DA]'
+                } ${hasVoted || isExpired ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <div className="absolute inset-0 flex items-center px-4">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0 ${
+                    selectedOption === option._id ? 'bg-white text-[#7765DA]' : 'bg-[#7765DA] text-white'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <span className={`ml-3 font-medium flex-1 ${selectedOption === option._id ? 'text-white' : 'text-[#373737]'}`}>{option.text}</span>
                 </div>
-                <span className="text-[#373737] font-medium">{option.text}</span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="flex justify-end">
           <button
             onClick={handleSubmit}
             disabled={!selectedOption || hasVoted || isExpired || isSubmitting}
-            className={`px-8 py-3 rounded-lg text-white font-semibold transition-all ${
+            className={`px-8 py-3 rounded-full text-white font-semibold transition-all ${
               selectedOption && !hasVoted && !isExpired && !isSubmitting
                 ? 'bg-gradient-to-r from-[#7765DA] to-[#4F0DCE] hover:opacity-90 cursor-pointer'
                 : 'bg-[#6E6E6E] cursor-not-allowed opacity-50'

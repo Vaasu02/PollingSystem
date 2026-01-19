@@ -42,6 +42,12 @@ const CreatePollForm = () => {
     e.preventDefault();
     setErrors({});
 
+    // Check if session exists
+    if (!sessionId) {
+      setErrors({ submit: 'Session not found. Please go back and start again.' });
+      return;
+    }
+
     const questionError = validateQuestion(question);
     if (questionError) {
       setErrors({ question: questionError });
@@ -54,14 +60,24 @@ const CreatePollForm = () => {
       return;
     }
 
+    const hasCorrectAnswer = validOptions.some(opt => opt.isCorrect);
+    if (!hasCorrectAnswer) {
+      setErrors({ options: 'Please mark at least one option as the correct answer (Yes)' });
+      return;
+    }
+
+    const newErrors: { [key: string]: string } = {};
     validOptions.forEach((opt, index) => {
       const error = validateOption(opt.text);
       if (error) {
-        setErrors({ [`option-${index}`]: error });
+        newErrors[`option-${index}`] = error;
       }
     });
 
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     try {
       setIsSubmitting(true);
@@ -70,11 +86,12 @@ const CreatePollForm = () => {
         options: validOptions,
         duration,
         sessionId,
-        createdBy: sessionId || '',
+        createdBy: sessionId,
       });
 
       if (response.data.poll) {
         setActivePoll(response.data.poll);
+        socketService.startPoll({ pollId: response.data.poll._id, teacherSessionId: sessionId || '' });
         navigate('/teacher/dashboard');
       }
     } catch (error: any) {
@@ -89,7 +106,8 @@ const CreatePollForm = () => {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <div className="bg-gradient-to-r from-[#7765DA] to-[#4F0DCE] px-4 py-2 rounded-full inline-flex items-center gap-2 mb-4">
-            <span className="text-white font-semibold">+ Intervue Poll</span>
+            <img src="/Vector.svg" alt="" className="w-4 h-4" />
+            <span className="text-white font-semibold">Intervue Poll</span>
           </div>
           <h1 className="text-4xl font-bold text-[#373737] mb-2">Let's Get Started.</h1>
           <p className="text-[#6E6E6E]">
@@ -129,55 +147,59 @@ const CreatePollForm = () => {
           </div>
 
           <div>
-            <label className="block text-[#373737] font-semibold mb-4">Edit Options</label>
+            <div className="flex justify-between items-center mb-4">
+              <label className="text-[#373737] font-semibold">Edit Options</label>
+              <span className="text-sm text-[#373737]">Is it Correct?</span>
+            </div>
             <div className="space-y-4">
               {options.map((option, index) => (
-                <div key={index} className="flex items-center gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#7765DA] text-white flex items-center justify-center font-semibold flex-shrink-0">
-                    {index + 1}
-                  </div>
-                  <input
-                    type="text"
-                    value={option.text}
-                    onChange={(e) => handleOptionChange(index, e.target.value)}
-                    className="flex-1 px-4 py-2 bg-[#F2F2F2] rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-[#7765DA] text-[#373737]"
-                    placeholder={`Option ${index + 1}`}
-                  />
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-[#373737]">Is it Correct?</span>
-                    <div className="flex gap-2">
-                      <label className="flex items-center gap-1 cursor-pointer">
+                <div key={index}>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-[#7765DA] text-white flex items-center justify-center font-semibold flex-shrink-0">
+                      {index + 1}
+                    </div>
+                    <input
+                      type="text"
+                      value={option.text}
+                      onChange={(e) => handleOptionChange(index, e.target.value)}
+                      className="flex-1 px-4 py-2 bg-[#F2F2F2] rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-[#7765DA] text-[#373737]"
+                      placeholder={`Option ${index + 1}`}
+                    />
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name={`correct-${index}`}
                           checked={option.isCorrect}
                           onChange={() => handleCorrectAnswer(index)}
-                          className="text-[#7765DA]"
+                          className="w-5 h-5 appearance-none border-2 border-[#6E6E6E] rounded-full checked:border-[#7765DA] checked:border-[6px] cursor-pointer"
                         />
                         <span className="text-sm text-[#373737]">Yes</span>
                       </label>
-                      <label className="flex items-center gap-1 cursor-pointer">
+                      <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
                           name={`correct-${index}`}
                           checked={!option.isCorrect}
                           onChange={() => {}}
-                          className="text-[#7765DA]"
+                          className="w-5 h-5 appearance-none border-2 border-[#6E6E6E] rounded-full checked:border-[#7765DA] checked:border-[6px] cursor-pointer"
                         />
                         <span className="text-sm text-[#373737]">No</span>
                       </label>
                     </div>
                   </div>
+                  {index === options.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={handleAddOption}
+                      className="mt-3 ml-12 px-4 py-2 bg-[#7765DA] text-white rounded-lg hover:opacity-90 flex items-center gap-2"
+                    >
+                      <span>+</span> Add More option
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={handleAddOption}
-              className="mt-4 px-4 py-2 bg-[#7765DA] text-white rounded-lg hover:opacity-90 flex items-center gap-2"
-            >
-              <span>+</span> Add More option
-            </button>
             {errors.options && <p className="mt-2 text-sm text-[#F44336]">{errors.options}</p>}
           </div>
 
@@ -187,7 +209,7 @@ const CreatePollForm = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`px-8 py-3 rounded-lg text-white font-semibold transition-all ${
+              className={`px-8 py-3 rounded-3xl text-white font-semibold transition-all ${
                 isSubmitting
                   ? 'bg-[#6E6E6E] cursor-not-allowed opacity-50'
                   : 'bg-gradient-to-r from-[#7765DA] to-[#4F0DCE] hover:opacity-90 cursor-pointer'

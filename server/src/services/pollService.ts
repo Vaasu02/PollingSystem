@@ -6,6 +6,20 @@ import { TimerService } from './timerService';
 
 export class PollService {
   static async createPoll(data: CreatePollDto): Promise<any> {
+    const activePoll = await Poll.findOne({ status: 'active' });
+    
+    if (activePoll) {
+      if (TimerService.isPollExpired(activePoll)) {
+        activePoll.status = 'ended';
+        await activePoll.save();
+      } else {
+        throw new Error('Cannot create poll. Another poll is currently active.');
+      }
+    }
+
+    const now = new Date();
+    const endTime = new Date(now.getTime() + data.duration * 1000);
+
     const poll = await Poll.create({
       question: data.question,
       options: data.options.map((opt) => ({
@@ -14,10 +28,17 @@ export class PollService {
         voteCount: 0,
       })),
       duration: data.duration,
-      status: 'draft',
+      status: 'active',
+      startTime: now,
+      endTime: endTime,
       createdBy: data.createdBy,
       totalVotes: 0,
     });
+
+    await Session.updateMany(
+      { isActive: true },
+      { currentPollId: poll._id.toString() }
+    );
 
     return poll;
   }
@@ -82,10 +103,6 @@ export class PollService {
       poll.status = 'ended';
       await poll.save();
       poll = null;
-    }
-    
-    if (!poll) {
-      poll = await Poll.findOne({ status: 'draft' }).sort({ createdAt: -1 });
     }
     
     return poll;

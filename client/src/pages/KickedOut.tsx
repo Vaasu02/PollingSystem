@@ -4,7 +4,8 @@ const KickedOut = () => {
       <div className="text-center">
         <div className="mb-8">
           <div className="bg-gradient-to-r from-[#7765DA] to-[#4F0DCE] px-4 py-2 rounded-full inline-flex items-center gap-2">
-            <span className="text-white font-semibold">⚡ Intervue Poll</span>
+            <img src="/Vector.svg" alt="" className="w-4 h-4" />
+            <span className="text-white font-semibold">Intervue Poll</span>
           </div>
         </div>
 

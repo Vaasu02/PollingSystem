@@ -129,26 +129,25 @@ const FloatingChat = () => {
               <div className="p-4">
                 {isLoading ? (
                   <div className="text-center text-[#6E6E6E]">Loading...</div>
-                ) : participants.length === 0 ? (
-                  <div className="text-center text-[#6E6E6E]">No participants yet</div>
+                ) : participants.filter(p => p.userType === 'student').length === 0 ? (
+                  <div className="text-center text-[#6E6E6E]">No students yet</div>
                 ) : (
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm text-[#6E6E6E] pb-2 border-b border-[#F2F2F2]">
                       <span>Name</span>
                       {userType === 'teacher' && <span>Action</span>}
                     </div>
-                    {participants.map((participant) => (
+                    {participants
+                      .filter((participant) => participant.userType === 'student')
+                      .map((participant) => (
                       <div
                         key={participant.sessionId}
                         className="flex justify-between items-center py-2"
                       >
                         <span className="text-[#373737] font-medium">
                           {participant.userName}
-                          {participant.userType === 'teacher' && (
-                            <span className="ml-2 text-xs text-[#7765DA]">(Teacher)</span>
-                          )}
                         </span>
-                        {userType === 'teacher' && participant.userType === 'student' && (
+                        {userType === 'teacher' && (
                           <button
                             onClick={() => handleKickOut(participant.sessionId)}
                             className="text-[#2196F3] text-sm hover:underline"
