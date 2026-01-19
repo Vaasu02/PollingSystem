@@ -10,7 +10,7 @@ import { env } from './config/env';
 
 const app: Application = express();
 
-// Configure CORS to allow requests from the frontend
+
 app.use(cors({
   origin: env.socketCorsOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
