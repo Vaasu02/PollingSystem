@@ -119,16 +119,23 @@ const CreatePollForm = () => {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-[#373737] font-semibold">Enter your question</label>
-              <select
-                value={duration}
-                onChange={(e) => setDuration(Number(e.target.value))}
-                className="px-3 py-1 border border-[#F2F2F2] rounded text-[#373737]"
-              >
-                <option value={30}>30 seconds</option>
-                <option value={60}>60 seconds</option>
-                <option value={90}>90 seconds</option>
-                <option value={120}>120 seconds</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={duration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                  className="px-4 py-2 pr-10 bg-[#F1F1F1] rounded text-[#373737] appearance-none cursor-pointer focus:outline-none"
+                >
+                  <option value={30}>30 seconds</option>
+                  <option value={60}>60 seconds</option>
+                  <option value={90}>90 seconds</option>
+                  <option value={120}>120 seconds</option>
+                </select>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="#7765DA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              </div>
             </div>
             <textarea
               value={question}
