@@ -10,8 +10,13 @@ import { env } from './config/env';
 
 const app: Application = express();
 
+// Determine CORS origin based on environment
+const corsOrigin = env.nodeEnv === 'production' 
+  ? (env.socketCorsOrigin !== 'http://localhost:3000' ? env.socketCorsOrigin : 'https://polling-system-five.vercel.app')
+  : (env.socketCorsOrigin || 'http://localhost:3000');
+
 app.use(cors({
-  origin: env.socketCorsOrigin || 'https://polling-system-five.vercel.app',
+  origin: corsOrigin,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
